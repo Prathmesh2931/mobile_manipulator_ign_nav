@@ -1,0 +1,26 @@
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf version="1.9">
+  <world name="rover_world">
+    <!-- Ground Plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <!-- Lighting -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- Physics -->
+    <physics name="default_physics" type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <!-- Rover Model -->
+    <include>
+      <uri>model://rover</uri>
+      <pose>0 0 0.3 0 0 0</pose>
+    </include>
+  </world>
+</sdf>
+```

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot name="test">
+  <!-- Material Definitions -->
+    <material name="gray">
+      <color rgba="0.2 0.2 0.8 1"/>
+    </material>
+    <material name="white">
+      <color rgba="1 1 1 1"/>
+    </material>
+
+  <!-- Base Link -->
+    <link name="base_link">
+      <inertial>
+        <mass value="1.1"/>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+        <iyy>0.01</iyy>
+        <iyz>0.0</iyz>
+        <izz>0.01</izz>
+      </inertia>
+    </inertial>
+    <visual name="visual">
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="file:///home/prathmesh2931/rover_eysip/src/rover_sim/sdf/meshes/base_link.stl" scale="0.0 0.01 0.01"/>
+      </geometry>
+      <material name="gray"/>
+    </material>
+    <collision name="collision">
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.2 0.2 0.05"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>

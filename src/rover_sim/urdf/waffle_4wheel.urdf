@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<robot name="waffle_4wheel">
+  <link name="base_footprint"/>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="-0.064 0 0.048" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.400 0.300 0.089"/>
+      </geometry>
+      <material name="light_grey">
+        <color rgba="0.921568627 0.925490196 0.941176471 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0.01" rpy="0 0 0"/>
+  </joint>
+
+  <link name="imu_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+      <material name="orange">
+        <color rgba="1.0 0.5 0.0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="-0.032 0 0.068" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_scan">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.0508" length="0.055"/>
+      </geometry>
+      <material name="dark_grey">
+        <color rgba="0.145098039 0.156862745 0.164705882 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="lidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_scan"/>
+    <origin xyz="-0.064 0 0.121" rpy="0 0 0"/>
+  </joint>
+
+  <link name="wheel_front_left_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>
+      <geometry>
+        <cylinder radius="0.033" length="0.018"/>
+      </geometry>
+      <material name="dark_grey">
+        <color rgba="0.145098039 0.156862745 0.164705882 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="wheel_front_left_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_front_left_link"/>
+    <origin xyz="0.1 0.144 0.023" rpy="-1.57 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="wheel_front_right_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>
+      <geometry>
+        <cylinder radius="0.033" length="0.018"/>
+      </geometry>
+      <material name="dark_grey">
+        <color rgba="0.145098039 0.156862745 0.164705882 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="wheel_front_right_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_front_right_link"/>
+    <origin xyz="0.1 -0.144 0.023" rpy="-1.57 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="wheel_rear_left_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>
+      <geometry>
+        <cylinder radius="0.033" length="0.018"/>
+      </geometry>
+      <material name="dark_grey">
+        <color rgba="0.145098039 0.156862745 0.164705882 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="wheel_rear_left_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_rear_left_link"/>
+    <origin xyz="-0.2 0.144 0.023" rpy="-1.57 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="wheel_rear_right_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>
+      <geometry>
+        <cylinder radius="0.033" length="0.018"/>
+      </geometry>
+      <material name="dark_grey">
+        <color rgba="0.145098039 0.156862745 0.164705882 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="wheel_rear_right_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_rear_right_link"/>
+    <origin xyz="-0.2 -0.144 0.023" rpy="-1.57 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="camera_link"/>
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="0.064 -0.065 0.094" rpy="0 0 0"/>
+  </joint>
+
+  <link name="camera_rgb_frame">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0.0 0.0 1.0 0.7"/>
+      </material>
+    </visual>
+  </link>
+  
+  <joint name="camera_rgb_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_rgb_frame"/>
+    <origin xyz="0.005 0.018 0.013" rpy="0 0 0"/>
+  </joint>
+</robot>
