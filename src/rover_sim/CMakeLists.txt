@@ -34,7 +34,7 @@ endif()
 
 install(
   DIRECTORY
-    src  urdf  launch  sdf config sdf/meshes worlds
+    src  urdf  launch  sdf config sdf/meshes worlds models meshes
   DESTINATION
     share/${PROJECT_NAME}/
 )
