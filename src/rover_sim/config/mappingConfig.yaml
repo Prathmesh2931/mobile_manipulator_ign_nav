@@ -1,0 +1,82 @@
+sync_slam:  # Must match the node name in launch file
+  ros__parameters:
+    # 🔧 FRAME CONFIGURATION - CRITICAL
+    odom_frame: odom        # SLAM will receive this via remapping from /odom/raw
+    map_frame: map          # SLAM will create this
+    base_frame: base_link   # Your rover's base frame
+    scan_topic: /scan       # Your LiDAR topic
+    
+    # 🔧 SLAM MODE
+    mode: mapping           # For creating new maps
+    
+    # 🔧 SOLVER CONFIGURATION
+    solver_plugin: solver_plugins::CeresSolver
+    ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
+    ceres_preconditioner: JACOBI
+    ceres_trust_strategy: LEVENBERG_MARQUARDT
+    ceres_dogleg_type: TRADITIONAL_DOGLEG
+    ceres_loss_function: None
+    
+    # 🔧 BASIC PARAMETERS
+    use_map_saver: true
+    debug_logging: true     # Enable for troubleshooting
+    
+    # 🔧 TIMING PARAMETERS (optimized for 10Hz LiDAR)
+    transform_publish_period: 0.05   # 20Hz map->odom updates
+    map_update_interval: 5.0         # Update map every 5 seconds
+    minimum_time_interval: 0.5       # Minimum time between scans
+    
+    # 🔧 MOVEMENT THRESHOLDS
+    minimum_travel_distance: 0.2     # Increase for stability
+    minimum_travel_heading: 0.2      # Increase for stability
+    
+    # 🔧 SCAN PARAMETERS (critical for queue issues)
+    throttle_scans: 1                # Use every scan
+    scan_buffer_size: 30             # Reduced for stability
+    scan_queue_size: 20              # Reduced for stability
+    
+    # 🔧 CORRELATION PARAMETERS
+    correlation_search_space_dimension: 0.3
+    correlation_search_space_resolution: 0.01
+    correlation_search_space_smear_deviation: 0.1
+    
+    # 🔧 LOOP CLOSURE PARAMETERS
+    do_loop_closing: true
+    loop_search_maximum_distance: 4.0
+    loop_match_minimum_chain_size: 8
+    loop_match_minimum_response_coarse: 0.4
+    loop_match_minimum_response_fine: 0.5
+    
+    # 🔧 MAP PARAMETERS
+    resolution: 0.05                # 5cm resolution
+    
+    # 🔧 TF PARAMETERS
+    tf_buffer_duration: 10.0
+    transform_timeout: 0.5
+    
+    # 🔧 STACK SIZE
+    stack_size_to_use: 40000000
+    
+    # 🔧 ENABLE POSITION TRACKING
+    enable_interactive_mode: true
+    
+    # 🔧 QOS SETTINGS (optimized for preventing queue overflow)
+    qos_overrides:
+      /scan:
+        subscriber:
+          depth: 20
+          durability: volatile
+          history: keep_last
+          reliability: best_effort
+      /tf:
+        subscriber:
+          depth: 100
+          durability: volatile
+          history: keep_last
+          reliability: reliable
+      /tf_static:
+        subscriber:
+          depth: 100
+          durability: transient_local
+          history: keep_last
+          reliability: reliable
