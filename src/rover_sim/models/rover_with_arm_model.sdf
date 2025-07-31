@@ -61,42 +61,66 @@
       <child>base_link</child>
     </joint>
 
-    <link name='imu_link'>
-      <pose relative_to='base_link'>-0.032 0 0.068 0 0 0</pose>
-      <inertial>
-        <mass>0.1</mass>
-        <inertia>
-          <ixx>0.0001</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.0001</iyy>
-          <iyz>0</iyz>
-          <izz>0.0001</izz>
-        </inertia>
-      </inertial>
-      <visual name='imu_visual'>
-        <geometry>
-          <box>
-            <size>0.02 0.02 0.02</size>
-          </box>
-        </geometry>
-        <material>
-          <ambient>1.0 0.5 0.0 1</ambient>
-          <diffuse>1.0 0.5 0.0 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-        </material>
-      </visual>
+    <link name="imu_link">
+      <sensor name="imu" type="imu">
+        <always_on>1</always_on>
+        <update_rate>200</update_rate>
+        <visualize>true</visualize>
+        <topic>imu</topic>
+        <ignition_frame_id>imu_link</ignition_frame_id>
+        <imu>
+          <angular_velocity>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>2e-4</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>2e-4</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>2e-4</stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7e-2</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7e-2</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7e-2</stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+      </sensor>
     </link>
-
-    <joint name='imu_joint' type='fixed'>
+    <joint name="imu_joint" type="fixed">
+      <pose>-0.032 0 0.068 0 0 0</pose>
       <parent>base_link</parent>
       <child>imu_link</child>
     </joint>
 
-    <link name='base_scan'>
-      <pose relative_to='base_link'>-0.064 0 0.121 0 0 0</pose>
+    <link name="base_scan">
       <inertial>
-        <mass>0.15</mass>
+        <pose>-0.052 0 0.111 0 0 0</pose>
         <inertia>
           <ixx>0.001</ixx>
           <ixy>0</ixy>
@@ -105,8 +129,10 @@
           <iyz>0</iyz>
           <izz>0.001</izz>
         </inertia>
+        <mass>0.114</mass>
       </inertial>
-      <collision name='lidar_collision'>
+      <collision name="lidar_sensor_collision">
+        <pose>-0.052 0 0.111 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0508</radius>
@@ -114,7 +140,8 @@
           </cylinder>
         </geometry>
       </collision>
-      <visual name='lidar_visual'>
+      <visual name="lidar_sensor_visual">
+        <pose>-0.064 0 0.121 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0508</radius>
@@ -122,41 +149,43 @@
           </cylinder>
         </geometry>
         <material>
-          <ambient>0.145098039 0.156862745 0.164705882 1</ambient>
           <diffuse>0.145098039 0.156862745 0.164705882 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
+          <ambient>0.145098039 0.156862745 0.164705882 1</ambient>
+          <specular>0.145098039 0.156862745 0.164705882 1</specular>
         </material>
       </visual>
-      <!-- Add Lidar Sensor Plugin -->
-      <sensor name="lidar" type="lidar">
-        <pose>0 0 0 0 0 0</pose>
-        <always_on>true</always_on>
-        <visualize>true</visualize>
-        <update_rate>10</update_rate>
-        <lidar>
+      <sensor name="gpu_lidar" type="gpu_lidar">
+        <pose>-0.064 0 0.121 0 0 0</pose>
+        <topic>scan</topic>
+        <ignition_frame_id>base_scan</ignition_frame_id>
+        <update_rate>5</update_rate>
+        <visualize>true</visualize>  <!-- Make sure visualization is enabled -->
+        <ray>
           <scan>
             <horizontal>
               <samples>360</samples>
               <resolution>1</resolution>
               <min_angle>0</min_angle>
-              <max_angle>6.28319</max_angle>
+              <max_angle>6.28</max_angle>
             </horizontal>
           </scan>
           <range>
-            <min>0.15</min>
-            <max>12.0</max>
-            <resolution>0.01</resolution>
+            <min>0.120000</min>
+            <max>20.0</max>
+            <resolution>0.015000</resolution>
           </range>
           <noise>
             <type>gaussian</type>
             <mean>0.0</mean>
             <stddev>0.01</stddev>
           </noise>
-        </lidar>
+        </ray>
+        <always_on>true</always_on>
+        <visualize>1</visualize>
       </sensor>
     </link>
-
-    <joint name='lidar_joint' type='fixed'>
+    <joint name="lidar_joint" type="fixed">
+      <pose>-0.064 0 0.121 0 0 0</pose>
       <parent>base_link</parent>
       <child>base_scan</child>
     </joint>
@@ -386,79 +415,68 @@
       </axis>
     </joint>
 
-    <link name='camera_link'>
-      <pose relative_to='base_link'>0.064 -0.065 0.094 0 0 0</pose>
-      <inertial>
-        <mass>0.1</mass>
-        <inertia>
-          <ixx>0.0001</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.0001</iyy>
-          <iyz>0</iyz>
-          <izz>0.0001</izz>
-        </inertia>
-      </inertial>
-    </link>
-
-    <joint name='camera_joint' type='fixed'>
+    <link name="camera_link"/>
+    <joint name="camera_joint" type="fixed">
       <parent>base_link</parent>
       <child>camera_link</child>
+      <pose>0.064 -0.065 0.094 0 0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
     </joint>
-
-    <link name='camera_rgb_frame'>
-      <pose relative_to='camera_link'>0.005 0.018 0.013 0 0 0</pose>
+    
+    <link name="camera_rgb_frame">
       <inertial>
-        <mass>0.1</mass>
+        <pose>0.069 -0.047 0.107 0 0 0</pose>
         <inertia>
-          <ixx>0.0001</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.0001</iyy>
-          <iyz>0</iyz>
-          <izz>0.0001</izz>
+          <ixx>0.001</ixx>
+          <ixy>0.000</ixy>
+          <ixz>0.000</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0.000</iyz>
+          <izz>0.001</izz>
         </inertia>
+        <mass>0.035</mass>
       </inertial>
-      <visual name='camera_rgb_visual'>
-        <geometry>
-          <box>
-            <size>0.02 0.02 0.02</size>
-          </box>
-        </geometry>
-        <material>
-          <ambient>0.0 0.0 1.0 0.7</ambient>
-          <diffuse>0.0 0.0 1.0 0.7</diffuse>
-          <specular>0.1 0.1 0.1 0.7</specular>
-        </material>
-      </visual>
-      <!-- Add Camera Sensor Plugin -->
+      <pose>0.069 -0.047 0.107 0 0 0</pose>
       <sensor name="camera" type="camera">
-        <pose>0 0 0 0 0 0</pose>
-        <camera>
-          <horizontal_fov>1.047</horizontal_fov>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <update_rate>30</update_rate>
+        <camera_info_topic>/camera/rgb/camera_info</camera_info_topic>
+        <topic>/camera/rgb/image_raw</topic>
+        <ignition_frame_id>camera_rgb_frame</ignition_frame_id>
+        <camera name="intel_realsense_r200">
+          <horizontal_fov>1.02974</horizontal_fov>
           <image>
-            <width>640</width>
-            <height>480</height>
+            <width>1920</width>
+            <height>1080</height>
+            <format>R8G8B8</format>
           </image>
           <clip>
-            <near>0.1</near>
-            <far>100</far>
+            <near>0.02</near>
+            <far>300</far>
           </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
         </camera>
-        <always_on>1</always_on>
-        <update_rate>30</update_rate>
-        <visualize>true</visualize>
       </sensor>
     </link>
-
-    <joint name='camera_rgb_joint' type='fixed'>
+    <joint name="camera_rgb_joint" type="fixed">
       <parent>camera_link</parent>
       <child>camera_rgb_frame</child>
+      <pose>0.005 0.018 0.013 0 0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
     </joint>
 
     <!-- Arm Mounting Bracket/Base -->
     <link name='arm_mount'>
-      <pose relative_to='base_link'>0.04 0 0.092 0 0 0</pose>
+      <pose relative_to='base_link'>-0.048 0 0.17 0 0 0</pose>
       <inertial>
         <mass>1.0</mass>
         <inertia>
@@ -910,20 +928,35 @@
       </visual>
     </link>
 
+    <!-- Global odometer -->
+
+    <plugin
+      filename="ignition-gazebo-odometry-publisher-system"
+      name="ignition::gazebo::systems::OdometryPublisher">
+      <odom_publish_frequency>50</odom_publish_frequency>
+      <odom_topic>/odom</odom_topic>
+      <odom_frame>odom</odom_frame>
+      <robot_base_frame>base_footprint</robot_base_frame>
+      <tf_topic>/odom/tf</tf_topic>
+    </plugin>
+
+
     <!-- Wheel control plugins -->
     <plugin name='ignition::gazebo::systems::DiffDrive' filename='libignition-gazebo-diff-drive-system.so'>
-      <left_joint>wheel_front_left_joint</left_joint>
-      <left_joint>wheel_rear_left_joint</left_joint>
-      <right_joint>wheel_front_right_joint</right_joint>
-      <right_joint>wheel_rear_right_joint</right_joint>
-      <wheel_separation>0.288</wheel_separation>
-      <wheel_radius>0.033</wheel_radius>
-      <odom_publish_frequency>10</odom_publish_frequency>
-      <topic>/cmd_vel</topic>
+        <left_joint>wheel_rear_left_joint</left_joint>
+        <right_joint>wheel_rear_right_joint</right_joint>
+        <left_joint>wheel_front_left_joint</left_joint>
+        <right_joint>wheel_front_right_joint</right_joint>
+        <wheel_separation>0.288</wheel_separation>
+        <wheel_radius>0.033</wheel_radius>
+        <topic>/cmd_vel</topic>
     </plugin>
     
     <!-- Joint State Publisher Plugin -->
-    <plugin name='ignition::gazebo::systems::JointStatePublisher' filename='libignition-gazebo-joint-state-publisher-system.so'/>
+    <plugin filename="libignition-gazebo-joint-state-publisher-system.so" 
+      name="ignition::gazebo::systems::JointStatePublisher">
+      <topic>joint_states</topic>
+    </plugin>
     
     <!-- Joint Position Controllers for the arm -->
     <plugin name='ignition::gazebo::systems::JointPositionController' filename='libignition-gazebo-joint-position-controller-system.so'>

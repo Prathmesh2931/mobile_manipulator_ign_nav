@@ -4,12 +4,12 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch.actions import (DeclareLaunchArgument, ExecuteProcess, GroupAction,
-                            IncludeLaunchDescription, LogInfo, TimerAction)
+                            IncludeLaunchDescription, LogInfo, TimerAction,
+                            SetEnvironmentVariable)  # Added this import
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
 from nav2_common.launch import RewrittenYaml
 
 
@@ -106,9 +106,9 @@ def generate_launch_description():
     
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(get_package_share_directory('turtlebot3_navigation2'),
-                                 'map',
-                                 'map.yaml'),
+        default_value=os.path.join(get_package_share_directory('turtlebot3'),
+                                 'maps',
+                                 'turtlebot3_world.yaml'),
         description='Full path to map yaml file to load')
     
     rviz_config_file = os.path.join(nav2_bringup_dir, 'rviz', 'nav2_default_view.rviz')

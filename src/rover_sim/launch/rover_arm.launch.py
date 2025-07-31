@@ -27,7 +27,7 @@ def generate_launch_description():
         sim_launch = 'ign_gazebo.launch.py'
         print("Using ros_ign packages")
     
-    # Load URDF file
+    # Load URDF file - Make sure this is the same URDF used in both setups
     urdf_file = os.path.join(pkg_share, 'urdf', 'waffle_4wheel.urdf')
     with open(urdf_file, 'r') as infp:
         robot_description = infp.read()
@@ -46,7 +46,8 @@ def generate_launch_description():
         TextSubstitution(text='/usr/lib/x86_64-linux-gnu/ign-gazebo-6/plugins')
     )
 
-    # Bridge configuration - using direct arguments for clarity
+    # Use the exact same bridge configuration as your working example
+    # Just add arm-specific topics
     ros_bridge = Node(
         package=bridge_pkg,
         executable='parameter_bridge',
@@ -56,22 +57,25 @@ def generate_launch_description():
             '/cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist',
             # Odometry (IGN -> ROS2)
             '/odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry',
-            # TF (IGN -> ROS2) - IMPORTANT: Do not remap this
+            # TF (IGN -> ROS2) - IMPORTANT: Keep exactly as in working example
             '/odom/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V',
             # Clock (IGN -> ROS2)
             '/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
             # Joint states (IGN -> ROS2)
             '/joint_states@sensor_msgs/msg/JointState[ignition.msgs.Model',
-            # Lidar (IGN -> ROS2)
+            # Lidar (IGN -> ROS2) - use both paths to ensure compatibility
             '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
-            '/model/rover_with_arm/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
-            # IMU (IGN -> ROS2)
+            # '/model/rover_with_arm/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
+
+           
+            '/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+            # IMU (IGN -> ROS2) - use both paths to ensure compatibility
             '/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU',
-            '/model/rover_with_arm/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU',
+            # '/model/rover_with_arm/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU',
             # Camera (IGN -> ROS2)
             '/camera/rgb/image_raw@sensor_msgs/msg/Image[ignition.msgs.Image',
             '/camera/rgb/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
-            # Add bridge connections for arm joint control
+            # Add arm control topics
             '/cmd_pos_joint1@std_msgs/msg/Float64]ignition.msgs.Double',
             '/cmd_pos_joint2@std_msgs/msg/Float64]ignition.msgs.Double',
             '/cmd_pos_joint3@std_msgs/msg/Float64]ignition.msgs.Double',
@@ -83,11 +87,13 @@ def generate_launch_description():
             '/pickup_target_box/detach@std_msgs/msg/Bool]ignition.msgs.Boolean',
             '/pickup_target_box/state@std_msgs/msg/Bool[ignition.msgs.Boolean',
         ],
-        # IMPORTANT: Do NOT remap /odom/tf to tf
+        remappings=[
+            ("/odom/tf", "tf"),
+        ],
         output='screen'
     )
 
-    # Spawn the TurtleBot world model
+    # Spawn the TurtleBot world model - keep exactly the same
     ignition_spawn_world = Node(
         package='ros_ign_gazebo',
         executable='create',
@@ -98,16 +104,16 @@ def generate_launch_description():
                    '-allow_renaming', 'false'],
     )
     
-    # Spawn our rover with arm - Updated to use the model file
+    # Spawn your rover with arm - CRITICAL: Use the same entity name pattern
     ignition_spawn_entity = Node(
             package='ros_ign_gazebo',
             executable='create',
             output='screen',
-            arguments=['-entity', 'rover_with_arm',
-                    '-name', 'rover_with_arm',
+            arguments=['-entity', 'waffle_4wheel',  # IMPORTANT: Use same name as working example
+                    '-name', 'waffle_4wheel',       # This is critical for TF to work
                     '-file', PathJoinSubstitution([
                             get_package_share_directory('rover_sim'),
-                            "models", "rover_with_arm_model.sdf"]),  # Use your model SDF
+                            "models", "rover_with_arm_model.sdf"]),  # Still use your arm model
                     '-allow_renaming', 'true',
                     '-x', '-2.0',
                     '-y', '-0.5',
@@ -123,14 +129,14 @@ def generate_launch_description():
                     '-name', 'pickup_box',
                     '-file', PathJoinSubstitution([
                             get_package_share_directory('rover_sim'),
-                            "models", "pickup_box.sdf"]),  # Use the box SDF
+                            "models", "pickup_box.sdf"]),
                     '-allow_renaming', 'true',
                     '-x', '0.4',
                     '-y', '0.0',
                     '-z', '0.1'],
             )
     
-    # Robot state publisher with the URDF
+    # Robot state publisher with the URDF - keep exactly the same
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -138,6 +144,8 @@ def generate_launch_description():
         parameters=[{'robot_description': robot_description,
                      'use_sim_time': True}]
     )
+    
+    # Use the exact same odom_to_foot.py script
     odom_to_base_footprint = Node(
         package='rover_sim',
         executable='odom_to_foot.py',
@@ -146,7 +154,7 @@ def generate_launch_description():
         output='screen'
     )
 
-    # Map to odom static transform
+    # Map to odom static transform - keep exactly the same
     map_static_tf = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -157,7 +165,7 @@ def generate_launch_description():
                   '--roll', '0', '--pitch', '0', '--yaw', '0']
     )
     
-    # CRITICAL FIX: Add explicit base_footprint to base_link transform
+    # base_footprint to base_link transform - keep exactly the same
     footprint_to_base_tf = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -168,7 +176,7 @@ def generate_launch_description():
                   '--roll', '0', '--pitch', '0', '--yaw', '0']
     )
     
-    # IMU filter - Make sure fixed_frame is base_link, not odom
+    # IMU filter - keep exactly the same
     madgwick_node = Node(
         package='imu_filter_madgwick',
         executable='imu_filter_madgwick_node',
@@ -202,7 +210,6 @@ def generate_launch_description():
             output='screen'
         )
     else:
-        # Create a default RViz configuration if custom one doesn't exist
         rviz_node = Node(
             package='rviz2',
             executable='rviz2',
@@ -211,26 +218,25 @@ def generate_launch_description():
             output='screen'
         )
 
-    # For debugging - prints all available topics
+    # For debugging - uncomment as needed
     list_topics_node = ExecuteProcess(
         cmd=['bash', '-c', 'sleep 10 && echo "Available topics:" && ros2 topic list'],
         output='screen'
     )
 
-    # For debugging - check TF tree
     tf_monitor = ExecuteProcess(
         cmd=['bash', '-c', 'sleep 12 && echo "TF Tree:" && ros2 run tf2_tools view_frames && echo "PDF created"'],
         output='screen'
     )
     
-    # Check for scan topic
     scan_monitor = ExecuteProcess(
         cmd=['bash', '-c', 'sleep 13 && echo "Checking scan topics:" && ros2 topic list | grep scan'],
         output='screen'
     )
+    
     world_only = os.path.join(get_package_share_directory('turtlebot3'), "models", "worlds", "world_only.sdf")
 
-    # Create the launch description
+    # Create the launch description - keep exactly the same structure
     ld = LaunchDescription([
         # Declare launch arguments
         DeclareLaunchArgument('gui', default_value='true'),
@@ -238,7 +244,7 @@ def generate_launch_description():
         ign_resource_path,
         ign_system_plugin_path,
         
-        # Launch Gazebo with empty world
+        # Launch Gazebo with empty world - keep exactly the same
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 [os.path.join(get_package_share_directory('ros_ign_gazebo'),
@@ -259,21 +265,21 @@ def generate_launch_description():
             actions=[ignition_spawn_world]
         ),
         
-        # Spawn your custom rover with arm
         TimerAction(
             period=5.0,
             actions=[ignition_spawn_entity]
         ),
         
-        # Spawn pickup box
+        # Spawn pickup box (additional for the arm setup)
         TimerAction(
-            period=6.0,
+            period=5.5,
             actions=[ignition_spawn_box]
         ),
         
         # Start robot_state_publisher, map->odom TF, and footprint->base_link TF
+        # Keep exactly the same order and timing
         TimerAction(
-            period=7.0,
+            period=6.0,
             actions=[
                 robot_state_publisher,
                 map_static_tf,
@@ -284,20 +290,21 @@ def generate_launch_description():
         
         # Start other nodes with delay
         TimerAction(
-            period=8.0,
+            period=7.0,
             actions=[madgwick_node]
         ),
         
         # Launch RViz after everything is set up
         # TimerAction(
-        #     period=9.0,
+        #     period=8.0,
         #     actions=[rviz_node]
         # ),
         
-        # # Debug tools
-        # list_topics_node,
-        # tf_monitor,
-        # scan_monitor
+        # Debug tools - uncomment as needed
+        # TimerAction(
+        #     period=9.0,
+        #     actions=[list_topics_node, tf_monitor, scan_monitor]
+        # )
     ])
     
     return ld

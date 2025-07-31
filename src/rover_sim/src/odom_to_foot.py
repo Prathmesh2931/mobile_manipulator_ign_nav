@@ -13,7 +13,7 @@ class OdomToTF(Node):
         # Subscribe to the odometry topic
         self.odom_sub = self.create_subscription(
             Odometry,
-            'odom',
+            '/odom',
             self.odom_callback,
             10)
             

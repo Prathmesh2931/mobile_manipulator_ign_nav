@@ -34,7 +34,7 @@ endif()
 
 install(
   DIRECTORY
-    src  urdf  launch  sdf config sdf/meshes worlds models meshes
+    src  urdf  launch  sdf config sdf/meshes worlds models meshes  rover_sim
   DESTINATION
     share/${PROJECT_NAME}/
 )
@@ -44,6 +44,7 @@ install(PROGRAMS
   src/ign_rover_odom.py
   src/go_goal_ign.py
   src/odom_to_foot.py
+  rover_sim/odom_to_foot.py
   DESTINATION lib/${PROJECT_NAME})
 
 
